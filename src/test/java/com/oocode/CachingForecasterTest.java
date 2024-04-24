@@ -51,4 +51,23 @@ public class CachingForecasterTest {
         assertThat(forecast2, equalTo(expectedForecast));
 
     }
-}
+
+    @Test
+    public void delegatesForecastingCachingSeveralDaysForecast() {
+        var delegate = mock(Forecaster.class);
+        Forecast expectedForecast = new Forecast(1, 2, FRIDAY);
+        given(delegate.forecastFor("Oxford", FRIDAY)).willReturn(expectedForecast);
+
+        var underTest = new CachingForecaster(delegate);
+
+        var forecast = underTest.forecastFor("Oxford", FRIDAY);
+        assertThat(forecast, equalTo(expectedForecast));
+
+        Forecast expectedForecast2 = new Forecast(2, 3, MONDAY);
+        given(delegate.forecastFor("Oxford", MONDAY)).willReturn(expectedForecast2);
+
+        var forecast2 = underTest.forecastFor("Oxford", MONDAY);
+
+        assertThat(forecast2, equalTo(expectedForecast2));
+        }
+    }
